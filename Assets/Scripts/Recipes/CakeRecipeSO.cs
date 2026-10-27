@@ -8,8 +8,6 @@ public class CakeRecipeSO : ScriptableObject
     // L'enum définit les formes de base possibles pour le sculptage
     public enum CakeShape { Rond, Carre, Coeur, Etoile }
 
-    [Header("Informations Générales")]
-    public string recipeName = "";
     [Tooltip("Temps accordé en mode Challenge (en secondes)")]
     public float timeAllowed = 120f;
 
