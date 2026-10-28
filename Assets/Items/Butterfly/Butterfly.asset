@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37e71f16525ca19408361205ced00adc, type: 3}
+  m_Name: Butterfly
+  m_EditorClassIdentifier: Assembly-CSharp::DecorationItem
+  itemName: 
+  icon: {fileID: 21300000, guid: a090d0b3229f3ec42976105407bd6cbf, type: 3}
+  prefab3D: {fileID: 8816751234066851948, guid: 802dcd8cd120b35418871c2adafac721, type: 3}
