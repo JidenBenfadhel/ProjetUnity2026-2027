@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System;
 
 public class GameManager : MonoBehaviour
@@ -44,6 +45,30 @@ public class GameManager : MonoBehaviour
         OnGameModeChanged?.Invoke(newMode);
         Debug.Log($"Mode de jeu choisi : {CurrentMode}");
     }
+    private void Update()
+    {
+        // RACCOURCIS DE TEST A SUPPRIMER
+
+        if (Keyboard.current == null) return;
+
+        // Appuie sur '1' (pavé numérique ou haut du clavier) pour forcer le mode Challenge
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            SetGameMode(GameMode.Challenge);
+        }
+
+        // Appuie sur '2' pour simuler l'arrivée d'un client (Génère la recette)
+        if (Keyboard.current.digit2Key.wasPressedThisFrame)
+        {
+            ChangeState(GameState.Client);
+        }
+
+        // Appuie sur '3' pour lancer la préparation du gâteau (Déclenche le chrono)
+        if (Keyboard.current.digit3Key.wasPressedThisFrame)
+        {
+            ChangeState(GameState.Gateau);
+        }
+    }
 
     public void ChangeState(GameState newState)
     {
@@ -57,19 +82,15 @@ public class GameManager : MonoBehaviour
         switch (newState)
         {
             case GameState.Menu:
-                // Ex: Réinitialiser les scores, vider l'inventaire
                 break;
 
             case GameState.Client:
-                // Ex: Générer un nouveau client et sa commande
                 break;
 
             case GameState.Gateau:
-                // Ex: Si CurrentMode == GameMode.Challenge, lancer le time
                 break;
 
             case GameState.Score:
-                // Ex: Lancer l'algorithme d'évaluation de ressemblance
                 break;
         }
     }
