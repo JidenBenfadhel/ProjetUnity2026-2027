@@ -3,29 +3,32 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-    [Header("Données")]
-    public List<DecorationItem> allDecorations; // La liste de tous tes ScriptableObjects (Fraise, Cerise...)
-
-    [Header("Interface")]
-    public GameObject slotPrefab; // Ton prefab "InventorySlot"
-    public Transform inventoryPanel; // Ton panel UI avec le Grid Layout Group
+    public List<DecorationItem> allDecorations;
+    public GameObject inventorySlotPrefab;
+    public Transform inventoryPanel;
 
     void Start()
     {
-        GenerateInventory();
+        // Affiche "Tous" au lancement
+        GenerateInventory(0);
     }
 
-    void GenerateInventory()
+    // Cette fonction sera maintenant appelée par tes boutons
+    public void GenerateInventory(int categoryIndex)
     {
-        // Pour chaque objet dans notre liste de données
+        foreach (Transform child in inventoryPanel)
+        {
+            Destroy(child.gameObject);
+        }
+
         foreach (DecorationItem item in allDecorations)
         {
-            // On crée un nouveau bouton dans le panel
-            GameObject newSlot = Instantiate(slotPrefab, inventoryPanel);
-
-            // On récupère le script du bouton pour lui donner ses informations
-            InventorySlotUI slotScript = newSlot.GetComponent<InventorySlotUI>();
-            slotScript.Setup(item);
+            if (categoryIndex == 0 || (int)item.category == (categoryIndex - 1))
+            {
+                GameObject newSlot = Instantiate(inventorySlotPrefab, inventoryPanel);
+                InventorySlotUI slotUI = newSlot.GetComponent<InventorySlotUI>();
+                slotUI.Setup(item);
+            }
         }
     }
 }
