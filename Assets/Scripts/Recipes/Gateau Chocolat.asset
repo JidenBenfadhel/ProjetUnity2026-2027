@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CakeRecipeSO
   timeAllowed: 90
   expectedShape: 0
-  expectedFrostingColor: {r: 1, g: 1, b: 1, a: 1}
+  expectedFrostingColor: {r: 0.26415092, g: 0.18657382, b: 0.16364065, a: 1}
   requiredToppings: []
   recipeImage: {fileID: 0}
