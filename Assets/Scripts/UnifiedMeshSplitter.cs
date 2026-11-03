@@ -44,10 +44,10 @@ public class UnifiedMeshSplitter : MonoBehaviour
             return true;
         }
 
-        return ExecuteUnifiedSplit(mf.sharedMesh, localPoints, localNormals, cutType);
+        return ExecuteUnifiedSplit(mf.sharedMesh, localPoints, localNormals, cutType, cuttingSolid);
     }
 
-    private bool ExecuteUnifiedSplit(Mesh sourceMesh, List<Vector3> localPoints, List<Vector3> localNormals, CutType cutType)
+    private bool ExecuteUnifiedSplit(Mesh sourceMesh, List<Vector3> localPoints, List<Vector3> localNormals, CutType cutType, Mesh cuttingSolid)
     {
         List<Triangle3D> paveTriangles = ExtractTriangles(sourceMesh);
         List<Triangle3D> outsideTris = new List<Triangle3D>();
@@ -79,7 +79,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
                 else outsideTris.Add(tri);
             }
 
-            // Génération des parois de tunnel strictement restreintes au volume du pavé
             seamWalls = BuildVerticalSideWalls(processedPoints, axis, bounds);
         }
         else if (cutType == CutType.ObliquePlaneCut)
@@ -100,21 +99,19 @@ public class UnifiedMeshSplitter : MonoBehaviour
 
             seamWalls = BuildPlanarCap(cutPlane, bounds);
         }
-        else // General3DPath
+        else // General3DPath (Forme 3D quelconque)
         {
-            Vector3 center = Vector3.zero;
-            foreach (Vector3 p in localPoints) center += p;
-            center /= localPoints.Count;
+            // 1. Extraction des plans 3D de la Convex Hull (cuttingSolid)
+            List<Plane> hullPlanes = ExtractPlanesFromMesh(cuttingSolid);
 
-            Vector3 loopNorm = ComputeLoopNormal(localPoints, center);
+            // 2. Subdivision du maillage du pavé par les faces de la Convex Hull 3D
+            List<Triangle3D> slicedTris = SubdivideTrianglesByPlanes(paveTriangles, hullPlanes);
 
-            List<Plane> segmentPlanes = BuildPathSegmentPlanes(localPoints, localNormals);
-            List<Triangle3D> slicedTris = SubdivideTrianglesByPlanes(paveTriangles, segmentPlanes);
-
+            // 3. Classification 3D : Un triangle est DEDANS s'il est situé derrière toutes les faces de la Convex Hull
             foreach (var tri in slicedTris)
             {
                 Vector3 triCenter = (tri.a + tri.b + tri.c) / 3f;
-                if (IsPointIn3DPolygonProjection(triCenter, localPoints, loopNorm))
+                if (IsPointInsideHull(triCenter, hullPlanes))
                 {
                     insideTris.Add(tri);
                 }
@@ -124,15 +121,8 @@ public class UnifiedMeshSplitter : MonoBehaviour
                 }
             }
 
-            List<int> seamIndices = Triangulate3DLoopDirect(localPoints);
-            for (int i = 0; i < seamIndices.Count; i += 3)
-            {
-                seamWalls.Add(new Triangle3D(
-                    localPoints[seamIndices[i]],
-                    localPoints[seamIndices[i + 1]],
-                    localPoints[seamIndices[i + 2]]
-                ));
-            }
+            // 4. Parois internes : Filtrage STRICT pour ne garder QUE les faces qui traversent l'intérieur du pavé
+            seamWalls = FilterInternalSeamWalls(cuttingSolid, bounds);
         }
 
         if (insideTris.Count == 0) return false;
@@ -149,7 +139,86 @@ public class UnifiedMeshSplitter : MonoBehaviour
     }
 
     // =================================================================
-    // PAROIS INTÉRIEURES ROGNÉES AUX BORDURES DU PAVÉ
+    // HELPERS CLASSIFICATION ET PLANS CONVEX HULL 3D
+    // =================================================================
+
+    /// <summary>
+    /// Filtre les triangles du cuttingSolid pour ne garder que la paroi de coupe qui passe À L'INTÉRIEUR du pavé.
+    /// Élimine les faces extérieures de la Convex Hull qui bordent la peau du pavé.
+    /// </summary>
+    private List<Triangle3D> FilterInternalSeamWalls(Mesh cuttingSolid, Bounds bounds)
+    {
+        List<Triangle3D> internalWalls = new List<Triangle3D>();
+        List<Triangle3D> allHullTris = ExtractTriangles(cuttingSolid);
+
+        // Marge de sécurité pour exclure les faces qui se trouvent sur les parois extérieures des bounds
+        float margin = bounds.size.magnitude * 0.01f;
+
+        Vector3 min = bounds.min;
+        Vector3 max = bounds.max;
+
+        foreach (var tri in allHullTris)
+        {
+            Vector3 center = (tri.a + tri.b + tri.c) / 3f;
+
+            // Vérification que le centre de la face est STRICTEMENT à l'intérieur du pavé
+            bool isInsideX = center.x > min.x + margin && center.x < max.x - margin;
+            bool isInsideY = center.y > min.y + margin && center.y < max.y - margin;
+            bool isInsideZ = center.z > min.z + margin && center.z < max.z - margin;
+
+            if (isInsideX && isInsideY && isInsideZ)
+            {
+                internalWalls.Add(tri);
+            }
+        }
+
+        return internalWalls;
+    }
+
+    private List<Plane> ExtractPlanesFromMesh(Mesh mesh)
+    {
+        List<Plane> planes = new List<Plane>();
+        Vector3[] verts = mesh.vertices;
+        int[] tris = mesh.triangles;
+
+        Vector3 centroid = Vector3.zero;
+        foreach (Vector3 v in verts) centroid += v;
+        centroid /= verts.Length;
+
+        for (int i = 0; i < tris.Length; i += 3)
+        {
+            Vector3 v0 = verts[tris[i]];
+            Vector3 v1 = verts[tris[i + 1]];
+            Vector3 v2 = verts[tris[i + 2]];
+
+            Vector3 norm = Vector3.Cross(v1 - v0, v2 - v0).normalized;
+            Vector3 faceCenter = (v0 + v1 + v2) / 3f;
+
+            if (Vector3.Dot(norm, faceCenter - centroid) < 0)
+            {
+                norm = -norm;
+            }
+
+            planes.Add(new Plane(norm, faceCenter));
+        }
+
+        return planes;
+    }
+
+    private bool IsPointInsideHull(Vector3 pt, List<Plane> hullPlanes)
+    {
+        foreach (Plane plane in hullPlanes)
+        {
+            if (plane.GetDistanceToPoint(pt) > 0.0001f)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // =================================================================
+    // PAROIS INTÉRIEURES ROGNÉES (2D EXTRUSION)
     // =================================================================
 
     private List<Triangle3D> BuildVerticalSideWalls(List<Vector3> points, Vector3 axis, Bounds bounds)
@@ -198,7 +267,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
                 u2 = p2.x; v2 = p2.y;
             }
 
-            // Rognage 2D du segment aux bordures [minU, maxU] x [minV, maxV]
             if (ClipSegment2D(u1, v1, u2, v2, minU, maxU, minV, maxV, out float cu1, out float cv1, out float cu2, out float cv2))
             {
                 Vector3 f1 = ForceDepthOnAxis2D(cu1, cv1, axis, maxDepth);
@@ -267,7 +335,7 @@ public class UnifiedMeshSplitter : MonoBehaviour
     }
 
     // =================================================================
-    // LOGIQUE DE SNAPPING DE BORD
+    // LOGIQUE DE SNAPPING DE BORD (2D EXTRUSION)
     // =================================================================
 
     private List<Vector3> SnapPointsToFaceEdges(List<Vector3> points, Bounds bounds, Vector3 axis, float snapMargin, float extension)
@@ -376,26 +444,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
         public Triangle3D(Vector3 a, Vector3 b, Vector3 c) { this.a = a; this.b = b; this.c = c; }
     }
 
-    private List<Plane> BuildPathSegmentPlanes(List<Vector3> pts, List<Vector3> normals)
-    {
-        List<Plane> planes = new List<Plane>();
-        int count = pts.Count;
-
-        for (int i = 0; i < count; i++)
-        {
-            Vector3 p1 = pts[i];
-            Vector3 p2 = pts[(i + 1) % count];
-            Vector3 segDir = (p2 - p1).normalized;
-
-            Vector3 norm = Vector3.Cross(segDir, normals[i]).normalized;
-            if (norm.sqrMagnitude > 0.001f)
-            {
-                planes.Add(new Plane(norm, p1));
-            }
-        }
-        return planes;
-    }
-
     private List<Triangle3D> SubdivideTrianglesByPlanes(List<Triangle3D> inputTris, List<Plane> planes)
     {
         List<Triangle3D> currentList = new List<Triangle3D>(inputTris);
@@ -487,31 +535,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
         return inside;
     }
 
-    private bool IsPointIn3DPolygonProjection(Vector3 pt, List<Vector3> poly3D, Vector3 loopNorm)
-    {
-        float absX = Mathf.Abs(loopNorm.x), absY = Mathf.Abs(loopNorm.y), absZ = Mathf.Abs(loopNorm.z);
-        Vector2 pt2D;
-        List<Vector2> poly2D = new List<Vector2>();
-
-        if (absX >= absY && absX >= absZ)
-        {
-            pt2D = new Vector2(pt.y, pt.z);
-            foreach (var p in poly3D) poly2D.Add(new Vector2(p.y, p.z));
-        }
-        else if (absY >= absX && absY >= absZ)
-        {
-            pt2D = new Vector2(pt.x, pt.z);
-            foreach (var p in poly3D) poly2D.Add(new Vector2(p.x, p.z));
-        }
-        else
-        {
-            pt2D = new Vector2(pt.x, pt.y);
-            foreach (var p in poly3D) poly2D.Add(new Vector2(p.x, p.y));
-        }
-
-        return IsPointInPolygon2D(pt2D, poly2D);
-    }
-
     private List<Triangle3D> BuildPlanarCap(Plane plane, Bounds bounds)
     {
         List<Triangle3D> capTris = new List<Triangle3D>();
@@ -569,68 +592,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
         }
 
         return capTris;
-    }
-
-    private List<int> Triangulate3DLoopDirect(List<Vector3> points)
-    {
-        List<int> tris = new List<int>();
-        int n = points.Count;
-        if (n < 3) return tris;
-
-        List<int> V = new List<int>();
-        for (int i = 0; i < n; i++) V.Add(i);
-
-        int safety = n * n * 2;
-
-        while (V.Count > 3 && safety > 0)
-        {
-            safety--;
-            int bestEarIdx = -1;
-            float minArea = float.MaxValue;
-
-            int count = V.Count;
-            for (int i = 0; i < count; i++)
-            {
-                int prevIdx = V[(i - 1 + count) % count];
-                int currIdx = V[i];
-                int nextIdx = V[(i + 1) % count];
-
-                Vector3 a = points[prevIdx];
-                Vector3 b = points[currIdx];
-                Vector3 c = points[nextIdx];
-
-                float area = Vector3.Cross(b - a, c - a).magnitude * 0.5f;
-                if (area < 0.000001f) continue;
-
-                if (area < minArea)
-                {
-                    minArea = area;
-                    bestEarIdx = i;
-                }
-            }
-
-            if (bestEarIdx != -1)
-            {
-                int prevIdx = V[(bestEarIdx - 1 + V.Count) % V.Count];
-                int currIdx = V[bestEarIdx];
-                int nextIdx = V[(bestEarIdx + 1) % V.Count];
-
-                tris.Add(prevIdx); tris.Add(currIdx); tris.Add(nextIdx);
-                V.RemoveAt(bestEarIdx);
-            }
-            else
-            {
-                tris.Add(V[0]); tris.Add(V[1]); tris.Add(V[2]);
-                V.RemoveAt(1);
-            }
-        }
-
-        if (V.Count == 3)
-        {
-            tris.Add(V[0]); tris.Add(V[1]); tris.Add(V[2]);
-        }
-
-        return tris;
     }
 
     private void ApplySplitToScene(Mesh mainMesh, Mesh cutMesh, CutType cutType)
