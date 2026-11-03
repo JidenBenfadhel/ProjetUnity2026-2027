@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c68f9256c8a2944c0a398fbc0f0b76e5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatar Customization/Runtime/Scripts/Core/IAvatarCustomizationService.cs
+  uploadId: 931482

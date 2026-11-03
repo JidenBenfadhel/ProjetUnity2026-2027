@@ -1,0 +1,21 @@
+{
+    "name": "Genies.Sdk.Avatar.Telemetry.Editor",
+    "rootNamespace": "Genies.Sdk.Avatar.Telemetry.Editor",
+    "references": [
+        "GUID:5bdd013ac45504995b2b999a6653f2b7",
+        "GUID:54d82f9c1bfda44e48ddbc01235cb1f7",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:19364bd2104b74e5092353e57fc95e0b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

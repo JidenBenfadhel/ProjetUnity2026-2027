@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 4e4414c9e63844eb8e9b442c33d52b12
+timeCreated: 1676032759
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatars/Runtime/Genie/FeatureControllers/Skin/Controllers/Color/ISkinColorController.cs
+  uploadId: 931482

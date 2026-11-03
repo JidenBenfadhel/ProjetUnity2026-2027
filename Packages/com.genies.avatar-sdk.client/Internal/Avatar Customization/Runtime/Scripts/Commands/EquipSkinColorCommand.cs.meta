@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 4d6b98a7ec044ed88a0776472651ab0b
+timeCreated: 1754590250
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatar Customization/Runtime/Scripts/Commands/EquipSkinColorCommand.cs
+  uploadId: 931482

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 66a6987495e1d4a5cb3b17d9e0a6b787
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatars/Runtime/Assets/CommonAnimations/InAir.anim
+  uploadId: 931482

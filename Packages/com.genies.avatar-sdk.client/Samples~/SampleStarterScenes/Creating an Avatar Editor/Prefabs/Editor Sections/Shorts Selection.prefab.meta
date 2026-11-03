@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e873389ee31d342de92b715f0d4c445a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Samples~/SampleStarterScenes/Creating
+    an Avatar Editor/Prefabs/Editor Sections/Shorts Selection.prefab
+  uploadId: 931482

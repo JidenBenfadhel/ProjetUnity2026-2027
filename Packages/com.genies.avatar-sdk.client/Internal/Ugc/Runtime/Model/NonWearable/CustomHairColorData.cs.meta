@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 1d28f97ca34f4047889ceba39778c737
+timeCreated: 1683083602
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Ugc/Runtime/Model/NonWearable/CustomHairColorData.cs
+  uploadId: 931482

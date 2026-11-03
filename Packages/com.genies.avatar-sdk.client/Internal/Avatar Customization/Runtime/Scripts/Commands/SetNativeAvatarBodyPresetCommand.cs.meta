@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: f3100c7f7d494085b6848e719f5e5987
+timeCreated: 1749742446
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatar Customization/Runtime/Scripts/Commands/SetNativeAvatarBodyPresetCommand.cs
+  uploadId: 931482

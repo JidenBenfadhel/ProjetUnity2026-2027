@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 2122c291e96e44cc89c08980a975ea2f
+timeCreated: 1717533308
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/DataModels/Runtime/Flair/FlairContainer.cs
+  uploadId: 931482

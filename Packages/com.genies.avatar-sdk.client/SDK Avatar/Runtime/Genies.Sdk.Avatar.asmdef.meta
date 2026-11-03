@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e00537590c217414e8b036dd2610e045
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/SDK Avatar/Runtime/Genies.Sdk.Avatar.asmdef
+  uploadId: 931482

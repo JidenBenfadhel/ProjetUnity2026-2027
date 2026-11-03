@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d79ba5afcb2444c4db93b9d6a9d6ee90
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Samples~/SampleStarterScenes/Creating
+    an Avatar Editor/Prefabs/Editor Sections/Glasses Selection.prefab
+  uploadId: 931482
