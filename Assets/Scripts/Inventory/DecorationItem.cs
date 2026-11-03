@@ -1,10 +1,21 @@
 using UnityEngine;
 
-// Cette ligne permet de créer facilement de nouveaux objets depuis le menu d'Unity
+// La liste de tes catégories (tu peux en ajouter autant que tu veux ici)
+public enum ItemCategory
+{
+    Fruits,
+    Fleurs,
+    Bougies,
+    Papillons
+}
+
 [CreateAssetMenu(fileName = "New Decoration", menuName = "Bakery/Decoration Item")]
 public class DecorationItem : ScriptableObject
 {
-    public string itemName; // Le nom (ex: "Fraise", "Cerise")
-    public Sprite icon;     // L'image 2D pour l'inventaire
-    public GameObject prefab3D; // Le modèle 3D qui apparaîtra sur le gâteau
+    public string itemName;
+    public Sprite icon;
+    public GameObject prefab3D;
+
+    // La nouvelle case qui apparaîtra dans Unity
+    public ItemCategory category;
 }
