@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 88fea0d320b6b4e35be2c9edd03ebbc8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Samples~/SampleStarterScenes/Creating
+    an Avatar Editor/Scripts/Helpers/RectTransformSizeChangeNotifier.cs
+  uploadId: 931482
