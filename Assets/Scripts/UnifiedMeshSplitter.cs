@@ -17,6 +17,18 @@ public class UnifiedMeshSplitter : MonoBehaviour
     public bool debugShowCuttingSolid = false;
     public float debugSolidOpacity = 0.5f;
 
+    // À ajouter en haut de la classe UnifiedMeshSplitter :
+    public static readonly List<GameObject> TrackedObjects = new List<GameObject>();
+
+    private void Awake()
+    {
+        TrackedObjects.RemoveAll(obj => obj == null);
+        if (!TrackedObjects.Contains(gameObject))
+        {
+            TrackedObjects.Add(gameObject);
+        }
+    }
+
     public bool PerformCut(List<Vector3> worldPoints, List<Vector3> worldNormals)
     {
         if (worldPoints == null || worldPoints.Count < 3) return false;
@@ -721,6 +733,11 @@ public class UnifiedMeshSplitter : MonoBehaviour
         pieceCol.convex = false;
 
         cutPieceObj.isStatic = true;
+
+        if (!TrackedObjects.Contains(cutPieceObj))
+        {
+            TrackedObjects.Add(cutPieceObj);
+        }
     }
 
     private void ShowDebugSolid(Mesh cuttingSolid, CutType cutType)
