@@ -15,11 +15,11 @@ public class FrostingManager : MonoBehaviour
 
     private void Update()
     {
-        // On vérifie qu'on est bien à l'étape du gâteau
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gateau)
-            return;
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Gateau) return;
 
-        // On détecte le clic gauche sur le gateau
+        // NOUVEAU : On s'arrête si l'outil actuel n'est pas le glaçage
+        if (ToolManager.Instance != null && ToolManager.Instance.currentTool != ToolType.Glacage) return;
+
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             ApplyFrosting();
