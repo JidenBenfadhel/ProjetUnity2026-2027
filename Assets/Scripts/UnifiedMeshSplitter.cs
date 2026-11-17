@@ -56,6 +56,13 @@ public class UnifiedMeshSplitter : MonoBehaviour
 
         Bounds bounds = sourceMesh.bounds;
 
+        Vector3 pathCenter = Vector3.zero;
+        foreach (var p in localPoints) pathCenter += p;
+        pathCenter /= localPoints.Count;
+
+        // Point de référence utilisé pour orienter les normales des parois internes
+        Vector3 referenceCenter = pathCenter;
+
         if (cutType == CutType.SingleFaceExtrusion)
         {
             Vector3 avgNormal = GetAverageNormal(localNormals);
@@ -83,31 +90,28 @@ public class UnifiedMeshSplitter : MonoBehaviour
         }
         else if (cutType == CutType.ObliquePlaneCut)
         {
-            Vector3 center = Vector3.zero;
-            foreach (Vector3 p in localPoints) center += p;
-            center /= localPoints.Count;
+            Vector3 planeNormal = ComputeLoopNormal(localPoints, pathCenter);
+            if (planeNormal.sqrMagnitude < 0.0001f) return false;
 
-            Vector3 planeNormal = ComputeLoopNormal(localPoints, center);
-            Plane cutPlane = new Plane(planeNormal, center);
+            Plane cutPlane = new Plane(planeNormal, pathCenter);
+            List<Vector3> cutIntersectionPoints = new List<Vector3>();
 
             foreach (var tri in paveTriangles)
             {
-                SplitTriangleByPlane(tri, cutPlane, out List<Triangle3D> front, out List<Triangle3D> back);
-                outsideTris.AddRange(front);
-                insideTris.AddRange(back);
+                SplitTriangleByPlaneWithPoints(tri, cutPlane, outsideTris, insideTris, cutIntersectionPoints);
             }
 
-            seamWalls = BuildPlanarCap(cutPlane, bounds);
+            seamWalls = BuildPlanarCapFromCutPoints(cutPlane, cutIntersectionPoints, bounds);
+
+            // Décaler la référence strictement du côté insideTris (-planeNormal)
+            // car pathCenter repose directement sur le plan de coupe (sinon dot == 0)
+            referenceCenter = pathCenter - planeNormal * 0.1f;
         }
         else // General3DPath (Forme 3D quelconque)
         {
-            // 1. Extraction des plans 3D de la Convex Hull (cuttingSolid)
             List<Plane> hullPlanes = ExtractPlanesFromMesh(cuttingSolid);
-
-            // 2. Subdivision du maillage du pavé par les faces de la Convex Hull 3D
             List<Triangle3D> slicedTris = SubdivideTrianglesByPlanes(paveTriangles, hullPlanes);
 
-            // 3. Classification 3D : Un triangle est DEDANS s'il est situé derrière toutes les faces de la Convex Hull
             foreach (var tri in slicedTris)
             {
                 Vector3 triCenter = (tri.a + tri.b + tri.c) / 3f;
@@ -121,18 +125,14 @@ public class UnifiedMeshSplitter : MonoBehaviour
                 }
             }
 
-            // 4. Parois internes : Filtrage STRICT pour ne garder QUE les faces qui traversent l'intérieur du pavé
             seamWalls = FilterInternalSeamWalls(cuttingSolid, bounds);
         }
 
-        if (insideTris.Count == 0) return false;
+        // Vérifier que les deux morceaux possèdent bien de la géométrie
+        if (insideTris.Count == 0 || outsideTris.Count == 0) return false;
 
-        Vector3 pathCenter = Vector3.zero;
-        foreach (var p in localPoints) pathCenter += p;
-        pathCenter /= localPoints.Count;
-
-        Mesh mainMesh = AssembleMeshWithOrientation(outsideTris, seamWalls, pathCenter, isMainPavé: true, "MainPavéMesh");
-        Mesh pieceMesh = AssembleMeshWithOrientation(insideTris, seamWalls, pathCenter, isMainPavé: false, "CutPieceMesh");
+        Mesh mainMesh = AssembleMeshWithOrientation(outsideTris, seamWalls, referenceCenter, isMainPavé: true, "MainPavéMesh");
+        Mesh pieceMesh = AssembleMeshWithOrientation(insideTris, seamWalls, referenceCenter, isMainPavé: false, "CutPieceMesh");
 
         ApplySplitToScene(mainMesh, pieceMesh, cutType);
         return true;
@@ -142,16 +142,11 @@ public class UnifiedMeshSplitter : MonoBehaviour
     // HELPERS CLASSIFICATION ET PLANS CONVEX HULL 3D
     // =================================================================
 
-    /// <summary>
-    /// Filtre les triangles du cuttingSolid pour ne garder que la paroi de coupe qui passe À L'INTÉRIEUR du pavé.
-    /// Élimine les faces extérieures de la Convex Hull qui bordent la peau du pavé.
-    /// </summary>
     private List<Triangle3D> FilterInternalSeamWalls(Mesh cuttingSolid, Bounds bounds)
     {
         List<Triangle3D> internalWalls = new List<Triangle3D>();
         List<Triangle3D> allHullTris = ExtractTriangles(cuttingSolid);
 
-        // Marge de sécurité pour exclure les faces qui se trouvent sur les parois extérieures des bounds
         float margin = bounds.size.magnitude * 0.01f;
 
         Vector3 min = bounds.min;
@@ -161,7 +156,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
         {
             Vector3 center = (tri.a + tri.b + tri.c) / 3f;
 
-            // Vérification que le centre de la face est STRICTEMENT à l'intérieur du pavé
             bool isInsideX = center.x > min.x + margin && center.x < max.x - margin;
             bool isInsideY = center.y > min.y + margin && center.y < max.y - margin;
             bool isInsideZ = center.z > min.z + margin && center.z < max.z - margin;
@@ -509,6 +503,58 @@ public class UnifiedMeshSplitter : MonoBehaviour
         }
     }
 
+    private void SplitTriangleByPlaneWithPoints(Triangle3D tri, Plane plane, List<Triangle3D> front, List<Triangle3D> back, List<Vector3> intersectionPoints)
+    {
+        float dA = plane.GetDistanceToPoint(tri.a);
+        float dB = plane.GetDistanceToPoint(tri.b);
+        float dC = plane.GetDistanceToPoint(tri.c);
+
+        // Conserver aussi les sommets déjà coplanaires (utile pour les coupes diagonales coin-à-coin)
+        if (Mathf.Abs(dA) < 0.0001f) intersectionPoints.Add(tri.a);
+        if (Mathf.Abs(dB) < 0.0001f) intersectionPoints.Add(tri.b);
+        if (Mathf.Abs(dC) < 0.0001f) intersectionPoints.Add(tri.c);
+
+        bool aFront = dA >= -0.0001f;
+        bool bFront = dB >= -0.0001f;
+        bool cFront = dC >= -0.0001f;
+
+        if (aFront && bFront && cFront) { front.Add(tri); return; }
+        if (!aFront && !bFront && !cFront) { back.Add(tri); return; }
+
+        Vector3 pA = tri.a, pB = tri.b, pC = tri.c;
+        float distA = dA, distB = dB, distC = dC;
+
+        if (aFront == bFront)
+        {
+            pA = tri.c; pB = tri.a; pC = tri.b;
+            distA = dC; distB = dA; distC = dB;
+        }
+        else if (aFront == cFront)
+        {
+            pA = tri.b; pB = tri.c; pC = tri.a;
+            distA = dB; distB = dC; distC = dA;
+        }
+
+        Vector3 AB = IntersectSegmentPlane(pA, pB, distA, distB);
+        Vector3 AC = IntersectSegmentPlane(pA, pC, distA, distC);
+
+        intersectionPoints.Add(AB);
+        intersectionPoints.Add(AC);
+
+        if (distA >= 0)
+        {
+            front.Add(new Triangle3D(pA, AB, AC));
+            back.Add(new Triangle3D(AB, pB, pC));
+            back.Add(new Triangle3D(AB, pC, AC));
+        }
+        else
+        {
+            back.Add(new Triangle3D(pA, AB, AC));
+            front.Add(new Triangle3D(AB, pB, pC));
+            front.Add(new Triangle3D(AB, pC, AC));
+        }
+    }
+
     private Vector3 IntersectSegmentPlane(Vector3 a, Vector3 b, float distA, float distB)
     {
         float denom = distA - distB;
@@ -533,6 +579,58 @@ public class UnifiedMeshSplitter : MonoBehaviour
             j = i;
         }
         return inside;
+    }
+
+    private List<Triangle3D> BuildPlanarCapFromCutPoints(Plane plane, List<Vector3> rawPoints, Bounds fallbackBounds)
+    {
+        List<Vector3> uniquePoints = new List<Vector3>();
+        foreach (Vector3 p in rawPoints)
+        {
+            bool exists = false;
+            for (int i = 0; i < uniquePoints.Count; i++)
+            {
+                if (Vector3.SqrMagnitude(uniquePoints[i] - p) < 0.000001f)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) uniquePoints.Add(p);
+        }
+
+        if (uniquePoints.Count < 3)
+        {
+            return BuildPlanarCap(plane, fallbackBounds);
+        }
+
+        Vector3 center = Vector3.zero;
+        foreach (var p in uniquePoints) center += p;
+        center /= uniquePoints.Count;
+
+        Vector3 norm = plane.normal;
+        Vector3 tangent = Vector3.up;
+        if (Mathf.Abs(Vector3.Dot(norm, tangent)) > 0.99f) tangent = Vector3.right;
+
+        Vector3.OrthoNormalize(ref norm, ref tangent);
+        Vector3 u = tangent;
+        Vector3 v = Vector3.Cross(norm, u);
+
+        uniquePoints.Sort((a, b) =>
+        {
+            Vector3 dirA = a - center;
+            Vector3 dirB = b - center;
+            float angleA = Mathf.Atan2(Vector3.Dot(dirA, v), Vector3.Dot(dirA, u));
+            float angleB = Mathf.Atan2(Vector3.Dot(dirB, v), Vector3.Dot(dirB, u));
+            return angleA.CompareTo(angleB);
+        });
+
+        List<Triangle3D> capTris = new List<Triangle3D>();
+        for (int i = 1; i < uniquePoints.Count - 1; i++)
+        {
+            capTris.Add(new Triangle3D(uniquePoints[0], uniquePoints[i], uniquePoints[i + 1]));
+        }
+
+        return capTris;
     }
 
     private List<Triangle3D> BuildPlanarCap(Plane plane, Bounds bounds)
