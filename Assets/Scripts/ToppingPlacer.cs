@@ -52,9 +52,6 @@ public class ToppingPlacer : MonoBehaviour
                 Quaternion spawnRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
 
                 GameObject newTopping = Instantiate(prefabToPlace, spawnPosition, spawnRotation);
-                newTopping.transform.SetParent(hit.collider.transform.parent);
-
-                Debug.Log("3. SUCCÈS ! Fruit instancié : " + newTopping.name);
             }
             else
             {
