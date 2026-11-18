@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // Indispensable pour changer de scène
 
 public class MainMenuUI : MonoBehaviour
 {
@@ -6,57 +7,79 @@ public class MainMenuUI : MonoBehaviour
     public GameObject mainMenuPanel;
     public GameObject modeSelectionPanel;
 
+    [Header("Scènes à charger")]
+    [Tooltip("Écris le nom exact de la scène du mode Challenge")]
+    public string challengeSceneName = "Boutique";
+    [Tooltip("Écris le nom exact de la scène du mode Libre (optionnel pour l'instant)")]
+    public string freeSceneName = "";
+
     private void Start()
     {
-        // Au lancement de la scène, on s'assure d'être sur le menu principal
         ShowMainMenu();
 
-        // Optionnel : S'assurer que le GameManager sait qu'on est dans le Menu
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ChangeState(GameManager.GameState.Menu);
         }
     }
 
-    // --- NAVIGATION INTERNE DU MENU ---
-
     public void ShowModeSelection()
     {
-        mainMenuPanel.SetActive(false);
-        modeSelectionPanel.SetActive(true);
+        if (mainMenuPanel != null && modeSelectionPanel != null)
+        {
+            mainMenuPanel.SetActive(false);
+            modeSelectionPanel.SetActive(true);
+        }
     }
 
     public void ShowMainMenu()
     {
-        modeSelectionPanel.SetActive(false);
-        mainMenuPanel.SetActive(true);
+        if (mainMenuPanel != null && modeSelectionPanel != null)
+        {
+            modeSelectionPanel.SetActive(false);
+            mainMenuPanel.SetActive(true);
+        }
     }
-
-    // --- COMMUNICATION AVEC LE GAME MANAGER (BACK) ---
 
     public void StartFreeMode()
     {
-        // On utilise les Enums définis par India dans son GameManager
-        GameManager.Instance.SetGameMode(GameManager.GameMode.Libre);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetGameMode(GameManager.GameMode.Libre);
+            GameManager.Instance.ChangeState(GameManager.GameState.Client);
+        }
 
-        // On passe à l'état Client pour déclencher la suite
-        GameManager.Instance.ChangeState(GameManager.GameState.Client);
+        if (!string.IsNullOrEmpty(freeSceneName))
+        {
+            SceneManager.LoadScene(freeSceneName);
+        }
     }
 
     public void StartChallengeMode()
     {
-        GameManager.Instance.SetGameMode(GameManager.GameMode.Challenge);
-        GameManager.Instance.ChangeState(GameManager.GameState.Client);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetGameMode(GameManager.GameMode.Challenge);
+            GameManager.Instance.ChangeState(GameManager.GameState.Client);
+        }
+
+        // Charge la scène renseignée dans l'Inspector
+        if (!string.IsNullOrEmpty(challengeSceneName))
+        {
+            SceneManager.LoadScene(challengeSceneName);
+        }
+        else
+        {
+            Debug.LogWarning("Aucun nom de scène renseigné pour le mode Challenge !");
+        }
     }
 
     public void QuitGame()
     {
-        Debug.Log("Fermeture du jeu !");
         Application.Quit();
 
-        // Stoppe le mode Play dans l'éditeur Unity
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
     }
-}
+}   
