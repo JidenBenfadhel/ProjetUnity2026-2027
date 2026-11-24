@@ -208,7 +208,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3683a9ccf9337a4a99f33d01c27f418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FrostingManager
-  currentColor: {r: 1, g: 0, b: 0, a: 1}
+  currentColor:
+    r: 1
+    g: 0
+    b: 0
+    a: 1
+  mainCamera: {fileID: 0}
 --- !u!1 &82142498
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,7 +844,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3683a9ccf9337a4a99f33d01c27f418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FrostingManager
-  currentColor: {r: 1, g: 0, b: 0, a: 1}
+  currentColor:
+    r: 1
+    g: 0
+    b: 0
+    a: 1
+  mainCamera: {fileID: 0}
 --- !u!1 &1419150612
 GameObject:
   m_ObjectHideFlags: 0
