@@ -31,16 +31,14 @@ public class InventorySlotUI : MonoBehaviour
     // Fonction appelée quand on clique sur le bouton
     public void OnSlotClicked()
     {
-        Debug.Log("Création de la décoration : " + currentItem.itemName);
-
-        // On vérifie d'abord que tu as bien glissé un modèle 3D dans ton Scriptable Object
+        // On vérifie d'abord que le modèle 3D existe bien dans le Scriptable Object[cite: 2]
         if (currentItem.prefab3D != null)
         {
-            // Instantiate(Objet_A_Créer, Position, Rotation)
-            // On le fait apparaître un peu en hauteur (Y = 1) pour qu'il ne soit pas coincé dans le sol
-            Vector3 positionApparition = new Vector3(0, 1, 0);
-
-            Instantiate(currentItem.prefab3D, positionApparition, Quaternion.identity);
+            // Au lieu de l'instancier, on le donne au ToolManager !
+            if (ToolManager.Instance != null)
+            {
+                ToolManager.Instance.SelectDecoration(currentItem.prefab3D);
+            }
         }
         else
         {
