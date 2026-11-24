@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 5d099d86727d4c55b1c3ca3a669fd188
+timeCreated: 1774023243
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/NAF/Runtime/Scripts/Settings/MaterialTextureStreamingSettings.cs
+  uploadId: 931482

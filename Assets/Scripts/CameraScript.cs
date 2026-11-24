@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,8 +8,15 @@ public class CameraScript : MonoBehaviour
     public float minVerticalAngle = -80f;
     public float maxVerticalAngle = 80f;
 
+    [Header("Animation Vue UI")]
+    public float transitionSpeed = 8f; // Vitesse de transition vers la vue préenregistrée
+
     private float horizontalAngle;
     private float verticalAngle;
+
+    private float targetHorizontalAngle;
+    private float targetVerticalAngle;
+    private bool isTransitioning = false;
 
     void Start()
     {
@@ -21,36 +27,83 @@ public class CameraScript : MonoBehaviour
 
         if (verticalAngle > 180f)
             verticalAngle -= 360f;
+
+        targetHorizontalAngle = horizontalAngle;
+        targetVerticalAngle = verticalAngle;
     }
 
     void Update()
     {
-        // Vérifie qu'une souris est disponible
         if (Mouse.current == null)
             return;
 
-        // Rotation uniquement si le clic gauche est maintenu
-        if (Mouse.current.leftButton.isPressed)
+        // Si le joueur clique/glisse, on interrompt la transition auto
+        if (Mouse.current.middleButton.isPressed)
         {
+            isTransitioning = false;
+
             Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
-            // Rotation horizontale et verticale
             horizontalAngle += mouseDelta.x * sensitivity;
             verticalAngle -= mouseDelta.y * sensitivity;
 
-            // Limite l'inclinaison verticale
             verticalAngle = Mathf.Clamp(
                 verticalAngle,
                 minVerticalAngle,
                 maxVerticalAngle
             );
 
-            // Applique la rotation au pivot
-            transform.rotation = Quaternion.Euler(
-                verticalAngle,
-                horizontalAngle,
-                0f
-            );
+            targetHorizontalAngle = horizontalAngle;
+            targetVerticalAngle = verticalAngle;
         }
+
+        // Animation progressive vers la cible quand un bouton est cliqué
+        if (isTransitioning)
+        {
+            horizontalAngle = Mathf.LerpAngle(horizontalAngle, targetHorizontalAngle, Time.deltaTime * transitionSpeed);
+            verticalAngle = Mathf.Lerp(verticalAngle, targetVerticalAngle, Time.deltaTime * transitionSpeed);
+
+            if (Mathf.Abs(Mathf.DeltaAngle(horizontalAngle, targetHorizontalAngle)) < 0.05f &&
+                Mathf.Abs(verticalAngle - targetVerticalAngle) < 0.05f)
+            {
+                horizontalAngle = targetHorizontalAngle;
+                verticalAngle = targetVerticalAngle;
+                isTransitioning = false;
+            }
+        }
+
+        // Applique la rotation
+        transform.rotation = Quaternion.Euler(
+            verticalAngle,
+            horizontalAngle,
+            0f
+        );
+    }
+
+    // --- Fonctions appelées par les Boutons UI ---
+
+    /// <summary> Vue du dessus (plafonné par maxVerticalAngle) </summary>
+    public void SetTopView()
+    {
+        SetTargetAngles(maxVerticalAngle, horizontalAngle);
+    }
+
+    /// <summary> Vue de face / côté sur l'axe X </summary>
+    public void SetViewX()
+    {
+        SetTargetAngles(0f, 90f);
+    }
+
+    /// <summary> Vue de face / côté sur l'axe Z </summary>
+    public void SetViewZ()
+    {
+        SetTargetAngles(0f, 0f);
+    }
+
+    private void SetTargetAngles(float vAngle, float hAngle)
+    {
+        targetVerticalAngle = Mathf.Clamp(vAngle, minVerticalAngle, maxVerticalAngle);
+        targetHorizontalAngle = hAngle;
+        isTransitioning = true;
     }
 }

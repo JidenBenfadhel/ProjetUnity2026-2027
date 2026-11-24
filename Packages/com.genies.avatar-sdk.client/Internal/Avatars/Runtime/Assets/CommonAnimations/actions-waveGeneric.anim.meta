@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 429030a54197c4dd2b2454899fa74318
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatars/Runtime/Assets/CommonAnimations/actions-waveGeneric.anim
+  uploadId: 931482

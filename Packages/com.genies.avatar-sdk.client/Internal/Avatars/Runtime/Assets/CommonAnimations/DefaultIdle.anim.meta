@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7342b0b61e2c74ff7948c12776bcd973
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Avatars/Runtime/Assets/CommonAnimations/DefaultIdle.anim
+  uploadId: 931482

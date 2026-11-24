@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 70e563fd45494bd196cef3d4e53aadbc
+timeCreated: 1705682949
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Utilities/Runtime/Scripts/BlendShapeFrame.cs
+  uploadId: 931482

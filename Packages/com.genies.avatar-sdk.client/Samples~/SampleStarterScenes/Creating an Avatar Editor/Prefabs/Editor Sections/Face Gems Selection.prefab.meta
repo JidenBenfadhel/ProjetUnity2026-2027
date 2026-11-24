@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6dd317719c1f24c809b4cceb56b7780d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Samples~/SampleStarterScenes/Creating
+    an Avatar Editor/Prefabs/Editor Sections/Face Gems Selection.prefab
+  uploadId: 931482

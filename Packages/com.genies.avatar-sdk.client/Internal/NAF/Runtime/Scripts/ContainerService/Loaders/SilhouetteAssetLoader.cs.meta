@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 7c8dfa9ea4274f78927c91afae2efae8
+timeCreated: 1774263166
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/NAF/Runtime/Scripts/ContainerService/Loaders/SilhouetteAssetLoader.cs
+  uploadId: 931482

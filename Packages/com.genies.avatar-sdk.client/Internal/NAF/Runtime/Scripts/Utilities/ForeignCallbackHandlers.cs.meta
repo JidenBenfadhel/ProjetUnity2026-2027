@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 1175f83ea44449d0a244a729a2f7c22f
+timeCreated: 1774359401
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/NAF/Runtime/Scripts/Utilities/ForeignCallbackHandlers.cs
+  uploadId: 931482

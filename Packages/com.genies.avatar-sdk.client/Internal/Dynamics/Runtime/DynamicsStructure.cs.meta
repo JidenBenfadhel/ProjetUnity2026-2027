@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 7ce9faf4bbdba3e4aa1b591beaea92cf
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 800
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Internal/Dynamics/Runtime/DynamicsStructure.cs
+  uploadId: 931482

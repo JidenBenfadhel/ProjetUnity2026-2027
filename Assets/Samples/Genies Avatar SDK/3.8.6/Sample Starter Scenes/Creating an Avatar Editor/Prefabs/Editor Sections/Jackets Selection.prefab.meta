@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7587dd2bb597e4cec9dda17cefbaa49e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 336166
+  packageName: Genies Avatar SDK
+  packageVersion: 3.8.6
+  assetPath: Packages/com.genies.avatar-sdk.client/Samples~/SampleStarterScenes/Creating
+    an Avatar Editor/Prefabs/Editor Sections/Jackets Selection.prefab
+  uploadId: 931482
