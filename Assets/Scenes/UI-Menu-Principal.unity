@@ -1164,7 +1164,7 @@ MonoBehaviour:
   mainMenuPanel: {fileID: 575175022}
   modeSelectionPanel: {fileID: 376925289}
   challengeSceneName: Boutique
-  freeSceneName: 
+  freeSceneName: doughmaking
 --- !u!4 &1360850409
 Transform:
   m_ObjectHideFlags: 0
