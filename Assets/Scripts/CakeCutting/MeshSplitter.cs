@@ -4,6 +4,20 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class MeshSplitter : MonoBehaviour
 {
+    [Header("Configuration Layer")]
+    [Tooltip("Nom du layer attribué aux morceaux créés")]
+    public string targetLayerName = "Cake";
+
+    protected virtual void Awake()
+    {
+        // S'assure que l'objet de base possède aussi le layer "Cake"
+        int cakeLayer = LayerMask.NameToLayer(targetLayerName);
+        if (cakeLayer != -1)
+        {
+            gameObject.layer = cakeLayer;
+        }
+    }
+
     public virtual bool SplitMesh(List<Vector3> worldPoints)
     {
         if (worldPoints == null || worldPoints.Count < 4) return false;
@@ -177,6 +191,18 @@ public class MeshSplitter : MonoBehaviour
     protected void CreateChildGameObject(string objName, Mesh mesh)
     {
         GameObject child = new GameObject(objName);
+
+        // Attribution du layer "Cake"
+        int cakeLayer = LayerMask.NameToLayer(targetLayerName);
+        if (cakeLayer != -1)
+        {
+            child.layer = cakeLayer;
+        }
+        else
+        {
+            Debug.LogWarning($"MeshSplitter : Le layer '{targetLayerName}' n'existe pas dans les paramètres du projet !");
+        }
+
         child.transform.SetParent(transform.parent, false);
         child.transform.position = transform.position;
         child.transform.rotation = transform.rotation;
