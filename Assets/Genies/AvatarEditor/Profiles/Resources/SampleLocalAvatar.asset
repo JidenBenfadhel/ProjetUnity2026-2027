@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64192a8731a594adaa28da65ed68a013, type: 3}
+  m_Name: SampleLocalAvatar
+  m_EditorClassIdentifier: Genies.Avatars.Customization::Genies.Avatars.Customization.LocalAvatarData
+  equippedAssetIds:
+  - AvatarBase/recmDqoKYpEG1TQV
+  - AvatarBase/recmdZ4c4ENEO817
+  - AvatarBase/recaG3AZTGON2489j
+  - AvatarBase/recPYcI8H58I3svQ1
+  - AvatarEyes/recme09fgV5K9r0C
+  - WardrobeGear/rec1GL3hq9XhgRKNP
+  - AvatarBase/rec6Yr02qA678eLxs
+  - Flair/recjcBSpeODAB5rTO
+  - Flair/rec9xgbshQWj03zWB
+  - WardrobeGear/9e0747efefb53aac
+  - WardrobeGear/recPwvOAOclyrya5L
+  - WardrobeGear/307654511fdd70db
+  serializedColors:
+    keys:
+    - gear-eyebrowsBase
+    - gear-eyebrowsR
+    - gear-eyelashesBase
+    - gear-eyelashesG
+    - gear-hairBase
+    - gear-eyebrowsG
+    - gear-hairG
+    - gear-eyelashesR
+    - gear-eyelashesB
+    - gear-eyebrowsB
+    - unified-skin
+    - gear-hairB
+    - gear-hairR
+    values:
+    - {r: 0.9372549, g: 0.7372549, b: 0.47058824, a: 1}
+    - {r: 0.9372549, g: 0.7372549, b: 0.47058824, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 0.8039216, g: 0.8039216, b: 0.77254903, a: 1}
+    - {r: 0.9372549, g: 0.7372549, b: 0.47058824, a: 1}
+    - {r: 0.84313726, g: 0.84313726, b: 0.83137256, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 0.9372549, g: 0.7372549, b: 0.47058824, a: 1}
+    - {r: 0.9372549, g: 0.85490197, b: 0.7607843, a: 1}
+    - {r: 0.78431374, g: 0.78431374, b: 0.74509805, a: 1}
+    - {r: 0.8235294, g: 0.8235294, b: 0.8, a: 1}
+  serializedBodyAttributes:
+    keys:
+    - BrowPositionVert
+    - WeightLowerTorso
+    - WeightLegs
+    - Belly
+    - NoseWidth
+    - BrowLength
+    - NoseHeight
+    - WeightHeadNeck
+    - ShoulderSize
+    - WeightArms
+    - Waist
+    - HipSize
+    - BrowThickness
+    - BrowSpacing
+    - JawLength
+    - JawWidth
+    - WeightUpperTorso
+    values:
+    - -0.7559433
+    - 0.030024052
+    - 0.5531256
+    - 0.042892575
+    - -0.5458473
+    - -0.24022925
+    - -0.70184314
+    - 1
+    - 0.74893034
+    - 0.6675663
+    - 0.45225096
+    - -0.31428236
+    - -0.12234831
+    - -0.25813216
+    - -1
+    - -1
+    - 0.0075799227
+  serializedTattooIds:
+    keys: 
+    values: []
+  HeadshotTexture: {fileID: 2800000, guid: 385129ca078dfef4e9913a639a714062, type: 3}
+  HeadshotPath: Assets/Genies/AvatarEditor/Headshots\SampleLocalAvatar-headshot.png
