@@ -8,10 +8,26 @@ public class SceneMeshTransfer : MonoBehaviour
     [Tooltip("Nom exact de la scène vierge de destination (doit être dans les Build Settings).")]
     public string nextSceneName = "PreviewScene";
 
+    [Header("Configuration Layer & Tag")]
+    [Tooltip("Nom du layer attribué aux objets transférés")]
+    public string targetLayerName = "Cake";
+    [Tooltip("Nom du tag attribué aux objets transférés (doit exister dans Tags & Layers)")]
+    public string targetTagName = "Cake";
+
     [Header("Options de Transfert")]
     [Tooltip("Centre l'ensemble des objets autour de (0,0,0) tout en gardant leurs positions relatives séparées.")]
     public bool centerGroupInNewScene = true;
     public bool includeMeshCollider = true;
+
+    private int GetCakeLayerIndex()
+    {
+        int layer = LayerMask.NameToLayer(targetLayerName);
+        if (layer == -1)
+        {
+            layer = LayerMask.NameToLayer(targetLayerName.ToLower());
+        }
+        return layer;
+    }
 
     /// <summary>
     /// Méthode publique à relier à l'événement OnClick() du bouton "Next" sur le Canvas.
@@ -55,10 +71,16 @@ public class SceneMeshTransfer : MonoBehaviour
             groupOffset /= survivingObjects.Count;
         }
 
+        int cakeLayer = GetCakeLayerIndex();
+        if (cakeLayer == -1)
+        {
+            Debug.LogWarning($"[SceneMeshTransfer] Le layer '{targetLayerName}' n'existe pas dans les paramètres du projet !");
+        }
+
         // 3. Créer un GameObject indépendant et épuré pour chaque objet survivant
         for (int i = 0; i < survivingObjects.Count; i++)
         {
-            CreateCleanPersistentObject(survivingObjects[i], groupOffset, i);
+            CreateCleanPersistentObject(survivingObjects[i], groupOffset, i, cakeLayer);
         }
 
         // 4. Nettoyer le registre et charger la scène vierge
@@ -66,7 +88,7 @@ public class SceneMeshTransfer : MonoBehaviour
         SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
     }
 
-    private void CreateCleanPersistentObject(GameObject sourceObj, Vector3 positionOffset, int index)
+    private void CreateCleanPersistentObject(GameObject sourceObj, Vector3 positionOffset, int index, int layerIndex)
     {
         MeshFilter sourceMf = sourceObj.GetComponent<MeshFilter>();
         MeshRenderer sourceMr = sourceObj.GetComponent<MeshRenderer>();
@@ -74,6 +96,25 @@ public class SceneMeshTransfer : MonoBehaviour
         // Création d'un GameObject racine séparé (sans scripts de découpe ni LineRenderer enfants)
         GameObject cleanObj = new GameObject($"{sourceObj.name}_{index}");
         cleanObj.transform.SetParent(null); // Obligatoire pour DontDestroyOnLoad
+
+        // Attribution du Layer "Cake"
+        if (layerIndex != -1)
+        {
+            cleanObj.layer = layerIndex;
+        }
+
+        // Attribution du Tag "Cake"
+        if (!string.IsNullOrEmpty(targetTagName))
+        {
+            try
+            {
+                cleanObj.tag = targetTagName;
+            }
+            catch (UnityException)
+            {
+                Debug.LogWarning($"[SceneMeshTransfer] Le Tag '{targetTagName}' n'existe pas dans Tags & Layers !");
+            }
+        }
 
         cleanObj.transform.position = sourceObj.transform.position - positionOffset;
         cleanObj.transform.rotation = sourceObj.transform.rotation;

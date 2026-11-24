@@ -7,6 +7,10 @@ public class MeshDeleter : MonoBehaviour
     [Tooltip("Script de dessin à désactiver lorsque le mode suppression est actif")]
     public MeshSegmentDrawer segmentDrawer;
 
+    [Header("Filtrage")]
+    [Tooltip("Layer ciblé pour la suppression (ex: cake)")]
+    public LayerMask targetLayer;
+
     [Header("Surbrillance")]
     [Tooltip("Matériau jaune appliqué au survol (Optionnel). Si vide, un matériau jaune est généré automatiquement.")]
     public Material highlightMaterial;
@@ -22,6 +26,20 @@ public class MeshDeleter : MonoBehaviour
     {
         // Force PhysX à détecter les Raycasts sur les faces arrière (Backfaces)
         Physics.queriesHitBackfaces = true;
+
+        // Si aucun layer n'a été sélectionné dans l'inspecteur, on récupère "cake" par défaut
+        if (targetLayer.value == 0)
+        {
+            int cakeLayer = LayerMask.NameToLayer("Cake");
+            if (cakeLayer != -1)
+            {
+                targetLayer = 1 << cakeLayer;
+            }
+            else
+            {
+                Debug.LogWarning("MeshDeleter : Le layer 'cake' n'existe pas dans les paramètres du projet !");
+            }
+        }
 
         if (highlightMaterial == null)
         {
@@ -66,7 +84,8 @@ public class MeshDeleter : MonoBehaviour
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        // Le raycast ne détecte désormais que les colliders sur le targetLayer
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, targetLayer))
         {
             GameObject hitObject = hit.transform.gameObject;
             Renderer hitRenderer = hitObject.GetComponent<Renderer>();
@@ -91,7 +110,7 @@ public class MeshDeleter : MonoBehaviour
             }
         }
 
-        // Si la souris ne pointe sur aucun mesh
+        // Si la souris ne pointe sur aucun mesh valide
         ResetHighlight();
     }
 

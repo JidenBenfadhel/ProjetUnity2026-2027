@@ -4,6 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class UnifiedMeshSplitter : MonoBehaviour
 {
+    [Header("Configuration Layer")]
+    [Tooltip("Nom du layer attribué aux morceaux découpés")]
+    public string targetLayerName = "Cake";
+
     [Header("Matériaux")]
     public Material cutPieceMaterial;
 
@@ -17,16 +21,33 @@ public class UnifiedMeshSplitter : MonoBehaviour
     public bool debugShowCuttingSolid = false;
     public float debugSolidOpacity = 0.5f;
 
-    // À ajouter en haut de la classe UnifiedMeshSplitter :
     public static readonly List<GameObject> TrackedObjects = new List<GameObject>();
 
     private void Awake()
     {
+        // Assigne aussi le layer "Cake" à l'objet principal au démarrage
+        int cakeLayer = GetCakeLayerIndex();
+        if (cakeLayer != -1)
+        {
+            gameObject.layer = cakeLayer;
+        }
+
         TrackedObjects.RemoveAll(obj => obj == null);
         if (!TrackedObjects.Contains(gameObject))
         {
             TrackedObjects.Add(gameObject);
         }
+    }
+
+    private int GetCakeLayerIndex()
+    {
+        int layer = LayerMask.NameToLayer(targetLayerName);
+        if (layer == -1)
+        {
+            // Sécurité si le layer a été créé en minuscule ("cake") ou avec majuscule ("Cake")
+            layer = LayerMask.NameToLayer(targetLayerName.ToLower());
+        }
+        return layer;
     }
 
     public bool PerformCut(List<Vector3> worldPoints, List<Vector3> worldNormals)
@@ -521,7 +542,6 @@ public class UnifiedMeshSplitter : MonoBehaviour
         float dB = plane.GetDistanceToPoint(tri.b);
         float dC = plane.GetDistanceToPoint(tri.c);
 
-        // Conserver aussi les sommets déjà coplanaires (utile pour les coupes diagonales coin-à-coin)
         if (Mathf.Abs(dA) < 0.0001f) intersectionPoints.Add(tri.a);
         if (Mathf.Abs(dB) < 0.0001f) intersectionPoints.Add(tri.b);
         if (Mathf.Abs(dC) < 0.0001f) intersectionPoints.Add(tri.c);
@@ -717,6 +737,18 @@ public class UnifiedMeshSplitter : MonoBehaviour
         }
 
         GameObject cutPieceObj = new GameObject($"PavéPiece_{cutType}");
+
+        // Attribution du layer "Cake" à la nouvelle part découpée
+        int cakeLayer = GetCakeLayerIndex();
+        if (cakeLayer != -1)
+        {
+            cutPieceObj.layer = cakeLayer;
+        }
+        else
+        {
+            Debug.LogWarning($"UnifiedMeshSplitter : Le layer '{targetLayerName}' n'existe pas dans les paramètres du projet !");
+        }
+
         cutPieceObj.transform.SetParent(transform.parent, false);
         cutPieceObj.transform.position = transform.position;
         cutPieceObj.transform.rotation = transform.rotation;

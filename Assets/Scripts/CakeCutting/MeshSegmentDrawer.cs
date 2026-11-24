@@ -16,6 +16,10 @@ public class MeshSegmentDrawer : MonoBehaviour
     public UnifiedMeshSplitter meshSplitter;
     public Material lineMaterial;
 
+    [Header("Filtrage")]
+    [Tooltip("Layer ciblé pour le tracé et la découpe (ex: Cake)")]
+    public LayerMask targetLayer;
+
     [Header("Configuration")]
     public float lineThickness = 0.015f;
     public float vertexSnapThreshold = 0.05f;
@@ -41,6 +45,23 @@ public class MeshSegmentDrawer : MonoBehaviour
     [Header("Activation UI")]
     public CutDrawMode currentMode = CutDrawMode.None;
     public bool disableAfterCut = true;
+
+    private void Start()
+    {
+        // Si aucun layer n'a été sélectionné dans l'inspecteur, on récupère "Cake" par défaut
+        if (targetLayer.value == 0)
+        {
+            int cakeLayer = LayerMask.NameToLayer("Cake");
+            if (cakeLayer != -1)
+            {
+                targetLayer = 1 << cakeLayer;
+            }
+            else
+            {
+                Debug.LogWarning("MeshSegmentDrawer : Le layer 'Cake' n'existe pas dans les paramètres du projet !");
+            }
+        }
+    }
 
     // =================================================================
     // MÉTHODES À APPELER DEPUIS LES BOUTONS DU CANVAS
@@ -268,7 +289,8 @@ public class MeshSegmentDrawer : MonoBehaviour
         if (Mouse.current == null) return;
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        // Le raycast ignore tout ce qui n'est pas sur targetLayer ("Cake")
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, targetLayer))
         {
             if (hit.transform == meshSplitter.transform || hit.transform.IsChildOf(meshSplitter.transform))
             {

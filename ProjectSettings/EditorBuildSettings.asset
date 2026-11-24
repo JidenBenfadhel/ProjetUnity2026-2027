@@ -14,12 +14,22 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Boutique.unity
     guid: f80b5596bbd30234097810a5038cf925
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Finitions.unity
     guid: 99aa2a1b96a0da646bf91ea55ee11f9d
   - enabled: 1
     path: Assets/Scenes/CakeCutting.unity
     guid: fa030f90b058c1146a1b42107214a259
+  - enabled: 1
+    path: Assets/Scenes/doughmaking.unity
+    guid: 1c1d1d597cdc2594d8bd8d38b84aad83
+  - enabled: 1
+    path: Assets/Scenes/furnace.unity
+    guid: 74ed2c1b3c9dfdd419e3f398bdefb974
+  - enabled: 1
+    path: Assets/Scenes/SceneToppingPlacer.unity
+    guid: ef938cfee8fc80e43b2ec360c7705a4c
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: b4f6b1c631b15734481f2951ddf4e7bf, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
